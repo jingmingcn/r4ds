@@ -1,6 +1,6 @@
-# Welcome {.unnumbered}
+# 前言 {.unnumbered}
 
-This is the website for the 2nd edition of **"R for Data Science"**.
+<!-- This is the website for the 2nd edition of **"R for Data Science"**.
 This book will teach you how to do data science with R: You'll learn how to get your data into R, get it into the most useful structure, transform it and visualize.
 
 In this book, you will find a practicum of skills for data science.
@@ -22,8 +22,8 @@ If you speak another language, you might be interested in the freely available t
 You can find suggested answers to exercises in the book at <https://mine-cetinkaya-rundel.github.io/r4ds-solutions>.
 
 Please note that R4DS uses a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
-By contributing to this book, you agree to abide by its terms.
+By contributing to this book, you agree to abide by its terms. -->
 
 ## Acknowledgements {.unnumbered}
 
-R4DS is hosted by <https://www.netlify.com> as part of their support of open source software and communities.
+<!-- R4DS is hosted by <https://www.netlify.com> as part of their support of open source software and communities. -->
