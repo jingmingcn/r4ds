@@ -3,7 +3,7 @@
 *_cache
 *_files
 _main.rds
-_book
+# _book
 *.md
 !CODE_OF_CONDUCT.md
 /*.html

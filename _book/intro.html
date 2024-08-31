@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="author" content="Hadley Wickham, Mine Çetinkaya-Rundel, and Garrett Grolemund">
+<title>1&nbsp; PostgreSQL数据库环境搭建 – 健康大数据SQL编程</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./index.html" rel="prev">
+<link href="./cover.jpg" rel="icon" type="image/jpeg">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script defer="" data-domain="r4ds.hadley.nz" src="https://plausible.io/js/plausible.js"></script>
+</head>
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./intro.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">PostgreSQL数据库环境搭建</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">健康大数据SQL编程</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/hadley/r4ds/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">前言</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">PostgreSQL数据库环境搭建</span></span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#postgresql-%E4%BB%8B%E7%BB%8D" id="toc-postgresql-介绍" class="nav-link active" data-scroll-target="#postgresql-%E4%BB%8B%E7%BB%8D"><span class="header-section-number">1.1</span> PostgreSQL 介绍</a></li>
+  <li>
+<a href="#postgresql-%E6%9E%B6%E6%9E%84" id="toc-postgresql-架构" class="nav-link" data-scroll-target="#postgresql-%E6%9E%B6%E6%9E%84"><span class="header-section-number">1.2</span> PostgreSQL 架构</a>
+  <ul class="collapse">
+<li><a href="#postmaster-postgresql%E7%9A%84supervisor%E8%BF%9B%E7%A8%8B" id="toc-postmaster-postgresql的supervisor进程" class="nav-link" data-scroll-target="#postmaster-postgresql%E7%9A%84supervisor%E8%BF%9B%E7%A8%8B"><span class="header-section-number">1.2.1</span> Postmaster: PostgreSQL的Supervisor进程</a></li>
+  <li><a href="#postgresql-%E7%9A%84%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98%E6%AE%B5" id="toc-postgresql-的共享内存段" class="nav-link" data-scroll-target="#postgresql-%E7%9A%84%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98%E6%AE%B5"><span class="header-section-number">1.2.2</span> PostgreSQL 的共享内存段</a></li>
+  <li><a href="#postgresql-%E7%9A%84%E5%90%8E%E5%8F%B0%E8%BF%9B%E7%A8%8B" id="toc-postgresql-的后台进程" class="nav-link" data-scroll-target="#postgresql-%E7%9A%84%E5%90%8E%E5%8F%B0%E8%BF%9B%E7%A8%8B"><span class="header-section-number">1.2.3</span> PostgreSQL 的后台进程</a></li>
+  <li><a href="#postgresql%E7%9A%84%E7%89%A9%E7%90%86%E6%96%87%E4%BB%B6" id="toc-postgresql的物理文件" class="nav-link" data-scroll-target="#postgresql%E7%9A%84%E7%89%A9%E7%90%86%E6%96%87%E4%BB%B6"><span class="header-section-number">1.2.4</span> PostgreSQL的物理文件</a></li>
+  </ul>
+</li>
+  <li><a href="#postgresql-%E4%B8%8E-oralce-%E6%AF%94%E8%BE%83" id="toc-postgresql-与-oralce-比较" class="nav-link" data-scroll-target="#postgresql-%E4%B8%8E-oralce-%E6%AF%94%E8%BE%83"><span class="header-section-number">1.3</span> PostgreSQL 与 Oralce 比较</a></li>
+  <li><a href="#postgresql-%E4%B8%8E-oralce-%E5%85%BC%E5%AE%B9%E6%80%A7" id="toc-postgresql-与-oralce-兼容性" class="nav-link" data-scroll-target="#postgresql-%E4%B8%8E-oralce-%E5%85%BC%E5%AE%B9%E6%80%A7"><span class="header-section-number">1.4</span> PostgreSQL 与 Oralce 兼容性</a></li>
+  <li>
+<a href="#postgresql%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%89%E8%A3%85%E4%B9%8Blinux%E7%8E%AF%E5%A2%83" id="toc-postgresql服务器安装之linux环境" class="nav-link" data-scroll-target="#postgresql%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%89%E8%A3%85%E4%B9%8Blinux%E7%8E%AF%E5%A2%83"><span class="header-section-number">1.5</span> PostgreSQL服务器安装之Linux环境</a>
+  <ul class="collapse">
+<li><a href="#%E7%8E%AF%E5%A2%83%E8%A6%81%E6%B1%82" id="toc-环境要求" class="nav-link" data-scroll-target="#%E7%8E%AF%E5%A2%83%E8%A6%81%E6%B1%82"><span class="header-section-number">1.5.1</span> 环境要求</a></li>
+  <li><a href="#%E5%AE%89%E8%A3%85%E6%AD%A5%E9%AA%A4" id="toc-安装步骤" class="nav-link" data-scroll-target="#%E5%AE%89%E8%A3%85%E6%AD%A5%E9%AA%A4"><span class="header-section-number">1.5.2</span> 安装步骤</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#postgresql%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%89%E8%A3%85%E4%B9%8Bwindows%E7%8E%AF%E5%A2%83" id="toc-postgresql服务器安装之windows环境" class="nav-link" data-scroll-target="#postgresql%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%89%E8%A3%85%E4%B9%8Bwindows%E7%8E%AF%E5%A2%83"><span class="header-section-number">1.6</span> PostgreSQL服务器安装之Windows环境</a>
+  <ul class="collapse">
+<li><a href="#%E7%8E%AF%E5%A2%83%E8%A6%81%E6%B1%82-1" id="toc-环境要求-1" class="nav-link" data-scroll-target="#%E7%8E%AF%E5%A2%83%E8%A6%81%E6%B1%82-1"><span class="header-section-number">1.6.1</span> 环境要求</a></li>
+  <li><a href="#%E5%AE%89%E8%A3%85%E6%AD%A5%E9%AA%A4-1" id="toc-安装步骤-1" class="nav-link" data-scroll-target="#%E5%AE%89%E8%A3%85%E6%AD%A5%E9%AA%A4-1"><span class="header-section-number">1.6.2</span> 安装步骤</a></li>
+  </ul>
+</li>
+  </ul><div class="toc-actions"><ul><li><a href="https://github.com/hadley/r4ds/edit/main/intro.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/hadley/r4ds/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title"><span id="sec-intro" class="quarto-section-identifier"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">PostgreSQL数据库环境搭建</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header><p>在现代数据驱动的研究与开发环境中，关系型数据库管理系统（RDBMS）是关键技术之一。PostgreSQL，作为开源的对象关系数据库管理系统，以其高度可扩展性和合规的标准SQL支持，得到了广泛应用。本实验指导书将指导各位同学如何在Windows、Linux以及MacOS环境下搭建一个PostgreSQL数据库环境，从而为后续的数据存储、查询和分析打下坚实基础。本实验将详细介绍PostgreSQL的安装、配置以及基本操作，帮助用户掌握数据库的基本操作技能，为科研工作中的数据管理提供有效支持。</p>
+<section id="postgresql-介绍" class="level2" data-number="1.1"><h2 data-number="1.1" class="anchored" data-anchor-id="postgresql-介绍">
+<span class="header-section-number">1.1</span> PostgreSQL 介绍</h2>
+<p>PostgreSQL 是一种高度可扩展的对象关系型数据库管理系统（ORDBMS），以其先进的功能和可靠性著称。作为最早开发的开源数据库之一，它已经有超过30年的历史，并且在学术界和工业界得到了广泛应用。PostgreSQL 的核心特点之一是它对标准 SQL 的完全支持，这使得它在与其他数据库系统的兼容性上表现出色。此外，PostgreSQL 还支持多种数据类型、复杂的查询操作、以及用户自定义函数，这些功能使得它能够处理各种复杂的数据管理需求，从而成为许多大型应用程序的首选。</p>
+<p>PostgreSQL 以其强大的扩展性著称，能够适应从小型应用到大型企业系统的各种需求。它提供了丰富的扩展机制，允许用户通过编写自定义函数、类型和操作符来扩展数据库的功能。这种扩展性使得 PostgreSQL 能够支持地理信息系统（GIS）中的空间数据，或者处理复杂的统计分析。此外，PostgreSQL 的存储过程功能支持多种编程语言（如 PL/pgSQL、PL/Python 和 PL/Perl），这为开发人员提供了极大的灵活性，使得他们能够在数据库内部进行复杂的计算和逻辑处理。</p>
+<p>在性能和可靠性方面，PostgreSQL 也表现出色。它内置了多种优化技术，如索引优化器、查询计划器、并行处理等，可以显著提高复杂查询的执行效率。此外，PostgreSQL 还支持多版本并发控制（MVCC），确保在高并发环境下依然能提供一致性的数据访问体验。对于数据的安全性和可靠性，PostgreSQL 提供了全面的备份和恢复工具，支持基于时间点的恢复（PITR），以及自动故障转移功能，这些特性使得它在许多关键任务应用中得到了广泛的信赖。总的来说，PostgreSQL 以其丰富的功能、良好的性能和卓越的扩展性，成为了现代数据管理系统中不可或缺的一部分。</p>
+</section><section id="postgresql-架构" class="level2" data-number="1.2"><h2 data-number="1.2" class="anchored" data-anchor-id="postgresql-架构">
+<span class="header-section-number">1.2</span> PostgreSQL 架构</h2>
+<p>PostgreSQL 是一种渐进式开源对象关系数据库管理系统，于 1996 年 7 月 8 日在加州大学伯克利分校发明。从那时起，PostgreSQL 进行了许多改进，使其成为一种先进的关系数据库管理系统。一个由开发人员和志愿者组成的活跃社区正在共同努力添加新功能并修复 PostgreSQL 中的错误。PostgreSQL 架构使用客户端-服务器模型接收来自最终用户的请求并处理该请求并将其还原给客户端。PostgreSQL 架构是每个用户客户端的流程。</p>
+<p>图 <a href="#fig-pg-arch" class="quarto-xref">Figure&nbsp;<span>1.1</span></a> 展示了PostgreSQL的进程和内存架构。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-arch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL数据库进程和内存架构图 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-arch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-process-and-memory-architecture.png" class="img-fluid figure-img" alt="PostgreSQL数据库进程和内存架构图 " width="956">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-arch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.1: PostgreSQL数据库进程和内存架构图
+</figcaption></figure>
+</div>
+</div>
+</div>
+<section id="postmaster-postgresql的supervisor进程" class="level3" data-number="1.2.1"><h3 data-number="1.2.1" class="anchored" data-anchor-id="postmaster-postgresql的supervisor进程">
+<span class="header-section-number">1.2.1</span> Postmaster: PostgreSQL的Supervisor进程</h3>
+<p>Postmaster 在 PostgreSQL 架构中充当监控进程，是 PostgreSQL 启动后第一个启动的进程。它充当监听器，负责对来自客户端的传入请求进行身份验证和授权，并为每个连接分配一个名为 Postgres 的新进程。Postmaster 还会持续监视该进程，如果该进程停止，则会启动该进程。</p>
+</section><section id="postgresql-的共享内存段" class="level3" data-number="1.2.2"><h3 data-number="1.2.2" class="anchored" data-anchor-id="postgresql-的共享内存段">
+<span class="header-section-number">1.2.2</span> PostgreSQL 的共享内存段</h3>
+<p>共享内存段是内存中的缓冲区缓存，用于事务和维护活动。分配不同的共享内存段来执行不同的操作。以下是主要的共享内存段。</p>
+<section id="共享缓冲区shared-buffer" class="level4" data-number="1.2.2.1"><h4 data-number="1.2.2.1" class="anchored" data-anchor-id="共享缓冲区shared-buffer">
+<span class="header-section-number">1.2.2.1</span> 共享缓冲区(Shared Buffer)</h4>
+<p>共享缓冲区是 PostgreSQL 实例中的内存区域，用于任何插入、更新、删除或选择操作，因为用户无法直接访问数据文件。修改或更新的数据称为脏数据，并通过称为写入器进程的后台进程写入物理数据文件。共享缓冲区的属性由 postgresql.conf 文件中的 shared_buffer 参数控制。</p>
+</section><section id="预写日志缓冲区wal-buffer" class="level4" data-number="1.2.2.2"><h4 data-number="1.2.2.2" class="anchored" data-anchor-id="预写日志缓冲区wal-buffer">
+<span class="header-section-number">1.2.2.2</span> 预写日志缓冲区(Wal Buffer)</h4>
+<p>Wal Buffer 也称为预写日志缓冲区(Write ahead logs buffer)，即事务日志缓冲区，用于存储已更改数据的元数据信息，这些信息用于在数据库恢复操作期间重建数据。事务日志缓冲区由名为 Wal writer 的后台进程写入物理文件 WAL 段或检查点段。Wal Buffer 的属性由 wal_buffers 参数管理。</p>
+</section><section id="提交日志缓冲区clog-buffer" class="level4" data-number="1.2.2.3"><h4 data-number="1.2.2.3" class="anchored" data-anchor-id="提交日志缓冲区clog-buffer">
+<span class="header-section-number">1.2.2.3</span> 提交日志缓冲区（CLOG Buffer）</h4>
+<p>PostgreSQL CLOB 缓冲区是提交日志，是主内存 (RAM) 中分配的区域，用于存储所有事务的状态。它显示事务是否完成。此缓冲区由数据库引擎自动管理，因为没有特定的参数。它由 PostgreSQL 数据库中的所有后台服务器和用户共享。</p>
+</section><section id="工作内存区work-memory" class="level4" data-number="1.2.2.4"><h4 data-number="1.2.2.4" class="anchored" data-anchor-id="工作内存区work-memory">
+<span class="header-section-number">1.2.2.4</span> 工作内存区(Work Memory)</h4>
+<p>当数据库 SQL 查询中涉及排序操作（包括 Order By、Distinct、Merge 连接）和哈希表操作（包括哈希连接、基于哈希的聚合或 IN 子句）时，将使用 PostgreSQL 工作内存区域。工作内存由 work_mem 参数控制。在复杂的 SQL 查询中，可能会有多个排序和哈希操作，并且对于每个排序和哈希操作，都会在 RAM 中分配一个内存，因此建议不要给这个内存区域赋予很大的值，否则它会耗尽所有 RAM 空间并给其他进程带来问题。</p>
+</section><section id="维护工作内存区maintenance-work-memory" class="level4" data-number="1.2.2.5"><h4 data-number="1.2.2.5" class="anchored" data-anchor-id="维护工作内存区maintenance-work-memory">
+<span class="header-section-number">1.2.2.5</span> 维护工作内存区(Maintenance Work Memory)</h4>
+<p>PostgreSQL维护工作内存区域用于执行维护工作，例如创建索引、添加索引、添加外键等。它由 Maintenance_work_mem 参数控制。</p>
+</section><section id="临时缓冲区temp-buffers" class="level4" data-number="1.2.2.6"><h4 data-number="1.2.2.6" class="anchored" data-anchor-id="临时缓冲区temp-buffers">
+<span class="header-section-number">1.2.2.6</span> 临时缓冲区(Temp Buffers)</h4>
+<p>在大型排序和散列操作期间访问临时表时会使用 PostgreSQL 临时缓冲区区域。这些缓冲区是特定于用户会话的。</p>
+</section></section><section id="postgresql-的后台进程" class="level3" data-number="1.2.3"><h3 data-number="1.2.3" class="anchored" data-anchor-id="postgresql-的后台进程">
+<span class="header-section-number">1.2.3</span> PostgreSQL 的后台进程</h3>
+<p>PostgreSQL 后台进程是 PostgreSQL 数据库的重要组成部分。这些进程用于维护内存和磁盘之间的一致性，从而使 PostgreSQL 数据库正常运行。每个 PostgreSQL 后台进程都有其作用。</p>
+<section id="后台写入器background-writer" class="level4" data-number="1.2.3.1"><h4 data-number="1.2.3.1" class="anchored" data-anchor-id="后台写入器background-writer">
+<span class="header-section-number">1.2.3.1</span> 后台写入器（Background Writer）</h4>
+<p>PostgreSQL 实例启动时，postmaster 会启动 PostgreSQL Background Writer。Background Writer 用于将脏缓冲区（也称为新的或修改过的共享缓冲区）写入数据文件，以便有足够的缓冲区空间可供使用。</p>
+<p>PostgreSQL后台写入器遵循以下三个参数将脏缓冲区从共享缓冲区写入数据文件。</p>
+<ul>
+<li>bgwriter_delay (200ms by default, 10ms – 10s possible):该参数用于定义两次成功执行的等待时间。</li>
+<li>bgwriter_lru_maxpages (100 pages by default, 0 – 1000 possible)： 该参数用于定义每次迭代中可以写入数据文件的最大缓冲区数。</li>
+<li>bgwriter_lru_multiplier (2.0 by default, 0-10.0 possible): 此参数用于定义将清除传入脏页的页数，该数基于上次延迟期间的计数。例如，如果该值设置为 2，传入页为 10，则在这种情况下，除非有 20 个缓冲区未到达，否则将清除脏缓冲区。</li>
+</ul></section><section id="检查点checkpointer" class="level4" data-number="1.2.3.2"><h4 data-number="1.2.3.2" class="anchored" data-anchor-id="检查点checkpointer">
+<span class="header-section-number">1.2.3.2</span> 检查点(Checkpointer)</h4>
+<p>PostgreSQL 检查点是在特定时间或由 DBA 手动发生的事件，用于将脏缓冲区（更改的数据或新数据）从内存（共享缓冲区）移动到磁盘（数据文件）。在崩溃恢复的情况下需要检查点，其中预写日志中的最新检查点告知应从哪个位置开始 REDO 恢复。</p>
+<p>下面讲一下数据库中的更改是如何进行的，过程又是什么样的。基本上，对于任何 DDL 和 DML 语句，PostgreSQL 都要求数据存在于 shared_buffers 中，如果数据不在共享缓冲区中，则 PostgreSQL 将数据文件中的数据带入共享缓冲区，然后执行 DDL 和 DML 操作。修改后的块称为脏页。提交提交命令后，有关更改的详细信息将写入磁盘上的预写日志文件，脏页将分别写入数据文件。</p>
+<p>PostgreSQL 检查点在以下条件下触发。</p>
+<ul>
+<li>手动使用 CHECKPOINT 命令。</li>
+<li>通过设置间隔参数 checkpoint_timeout。默认值为 300 秒。</li>
+<li>当 Online Backup 启动时，PostgreSQL Checkpoint 触发器。</li>
+<li>当函数 pg_start_backup 执行 PostgreSQL Checkpoint 触发的 post 时。</li>
+<li>当函数 pg_basebackup 执行 PostgreSQL Checkpoint 触发的 post 时。</li>
+<li>当 WAL 参数 max_wal_size 达到其最大限制时。默认值为 1 GB。</li>
+<li>当 使用 CREATE DATABASE / DROP DATABASE 命令配置数据库时。</li>
+</ul>
+<p>一旦 PostgreSQL 检查点命令触发，就会执行以下操作。</p>
+<ul>
+<li>检查共享缓冲区中的所有脏页。</li>
+<li>将这些脏页写入相应的数据文件中。</li>
+<li>执行fsync()函数将所有最新数据记录到磁盘上。</li>
+</ul></section><section id="自动真空发射器autovacuum-launcher" class="level4" data-number="1.2.3.3"><h4 data-number="1.2.3.3" class="anchored" data-anchor-id="自动真空发射器autovacuum-launcher">
+<span class="header-section-number">1.2.3.3</span> 自动真空发射器（Autovacuum Launcher）</h4>
+<p>PostgreSQL Autovacuum Launcher 是默认启用的后台进程，用于自动执行 ANALYZE 和 VACUUM 命令。此进程在 PostgreSQL 中默认启用，如果设置了自动清理，则每 autovacuum_naptime 秒运行一次。</p>
+</section><section id="wal-writer" class="level4" data-number="1.2.3.4"><h4 data-number="1.2.3.4" class="anchored" data-anchor-id="wal-writer">
+<span class="header-section-number">1.2.3.4</span> WAL Writer</h4>
+<p>PostgreSQL WAL Writer 后台进程用于在提交发出后将更改的记录从 WAL 缓冲区写入 WAL 文件。</p>
+<p>以下命令用于检查当前 WAL 位置文件。</p>
+<pre><code>postgres=# SELECT Pg_xlogfile_name(Pg_current_xlog_location());</code></pre>
+</section><section id="统计收集器statistics-collector" class="level4" data-number="1.2.3.5"><h4 data-number="1.2.3.5" class="anchored" data-anchor-id="统计收集器statistics-collector">
+<span class="header-section-number">1.2.3.5</span> 统计收集器（Statistics Collector）</h4>
+<p>PostgreSQL Statscollector 后台用于收集有关服务器活动的统计信息，例如表中的记录数、数据库详细信息、索引和表访问详细信息，并将其报告给优化器字典 (pg_catalog)。此过程是可选的，默认情况下处于开启状态。统计信息可以通过 PostgreSQL 提供的许多视图查看。</p>
+<p>以下命令显示 PostgreSQL 中所有与统计相关的视图。</p>
+<pre><code>postgres=# \d pg_stat</code></pre>
+<p>PostgreSQL postgresql.conf 文件中的以下参数定义统计收集器将收集的详细信息。</p>
+<ul>
+<li>track_activities：此参数监视任何服务器进程正在执行的命令。</li>
+<li>track_functions：此参数跟踪 UDF（用户定义函数）的使用情况。</li>
+<li>track_counts：此参数跟踪在表和索引上收集的统计信息数量。</li>
+<li>track_io_timing：此参数将跟踪读取和写入块的数量。</li>
+</ul></section><section id="日志收集器logging-collector" class="level4" data-number="1.2.3.6"><h4 data-number="1.2.3.6" class="anchored" data-anchor-id="日志收集器logging-collector">
+<span class="header-section-number">1.2.3.6</span> 日志收集器(Logging Collector)</h4>
+<p>PostgreSQL 日志收集器后台进程用于将消息记录在日志文件中。当在 postgresql.conf 配置文件中设置以下参数值时，它会起作用。</p>
+<pre><code>log_destination = 'stderr'
+logging_collector = ON
+log_directory = 'pg_log'</code></pre>
+</section><section id="归档器archiver" class="level4" data-number="1.2.3.7"><h4 data-number="1.2.3.7" class="anchored" data-anchor-id="归档器archiver">
+<span class="header-section-number">1.2.3.7</span> 归档器(Archiver)</h4>
+<p>当数据库处于 Archive.log 模式时，PostgreSQL Archiver 后台进程会将 WAL 缓冲区写入 WAL 文件。</p>
+</section></section><section id="postgresql的物理文件" class="level3" data-number="1.2.4"><h3 data-number="1.2.4" class="anchored" data-anchor-id="postgresql的物理文件">
+<span class="header-section-number">1.2.4</span> PostgreSQL的物理文件</h3>
+<p>PostgreSQL 物理文件用于以数据文件的形式存储实际数据、WAL 文件中更改的块、日志文件中的服务器日志详细信息、存档日志信息等。这些文件中的数据被永久存储并用于各自的操作。</p>
+<section id="数据文件" class="level4" data-number="1.2.4.1"><h4 data-number="1.2.4.1" class="anchored" data-anchor-id="数据文件">
+<span class="header-section-number">1.2.4.1</span> 数据文件</h4>
+<p>PostgreSQL 数据文件用于存储实际数据。它存储实际数据，不存储任何指令或任何类型的代码信息。当用户请求数据时，PostgreSQL 会在共享缓冲区中查找数据，如果不存在，则从共享缓冲区中的数据文件加载数据，然后进一步处理。</p>
+</section><section id="wal文件" class="level4" data-number="1.2.4.2"><h4 data-number="1.2.4.2" class="anchored" data-anchor-id="wal文件">
+<span class="header-section-number">1.2.4.2</span> Wal文件</h4>
+<p>PostgreSQL WAL 文件用于在提交发生之前存储 WAL 缓冲区中的所有更改。 WAL 文件主要用于在数据库存储上的写入操作期间保持持久性和一致性。</p>
+</section><section id="日志文件" class="level4" data-number="1.2.4.3"><h4 data-number="1.2.4.3" class="anchored" data-anchor-id="日志文件">
+<span class="header-section-number">1.2.4.3</span> 日志文件</h4>
+<p>PostgreSQL 日志文件存储与服务器相关的所有日志、stderr、csvlog、Syslog、错误消息、警告消息、信息消息等。它可以帮助数据库管理员详细调试任何问题。</p>
+</section><section id="档案文件" class="level4" data-number="1.2.4.4"><h4 data-number="1.2.4.4" class="anchored" data-anchor-id="档案文件">
+<span class="header-section-number">1.2.4.4</span> 档案文件</h4>
+<p>PostgreSQL 存档日志文件用于将 WAL 段存储在磁盘上。存档日志用于在发生意外崩溃导致数据丢失的情况下，在这种情况下，存档日志用于修复。</p>
+</section></section></section><section id="postgresql-与-oralce-比较" class="level2" data-number="1.3"><h2 data-number="1.3" class="anchored" data-anchor-id="postgresql-与-oralce-比较">
+<span class="header-section-number">1.3</span> PostgreSQL 与 Oralce 比较</h2>
+<p>Oracle 数据库是由甲骨文公司开发的一款企业级关系数据库管理系统（RDBMS），以其高性能、高可用性和强大的数据处理能力著称。它广泛应用于全球各行业的大型企业，支持复杂事务处理、数据仓库、大数据分析等多种应用场景。Oracle 数据库还提供了丰富的功能，如多租户架构、自动存储管理（ASM）、Real Application Clusters（RAC），以及强大的安全性和备份恢复机制。</p>
+<p>在选择数据库管理系统（DBMS）时，PostgreSQL 和 Oracle 常常被放在一起进行比较。尽管两者都在企业级应用中表现出色，但它们在特性、成本、扩展性、开源性和社区支持等方面存在明显差异。</p>
+<ol type="1">
+<li><p><strong>开源性与成本</strong>: PostgreSQL 是一个完全开源的数据库管理系统，这意味着用户可以免费获取、使用和修改其源代码。因此，PostgreSQL 在总拥有成本（TCO）方面明显低于Oracle。此外，PostgreSQL 没有许可证费用，使其在中小企业和初创公司中非常受欢迎。相比之下，Oracle 是一种专有软件，许可证费用较高，且维护成本相对较大。这使得Oracle在大型企业或有特殊需求的场景下更常被选择。</p></li>
+<li><p><strong>功能性与扩展性</strong>: Oracle 在功能性上非常强大，尤其在数据处理、大规模事务处理以及高可用性方面有着成熟的解决方案。Oracle 拥有诸如Real Application Clusters（RAC）、自动存储管理（ASM）等企业级特性，支持跨多个服务器的高可用性和负载均衡。虽然PostgreSQL 也具备很强的功能性，但在某些高端企业级功能上，Oracle 仍然占据优势。然而，PostgreSQL 的高度扩展性使其能够通过插件和扩展模块实现许多类似功能，如PostGIS扩展用于空间数据处理。</p></li>
+<li><p><strong>标准支持与兼容性</strong>: PostgreSQL 完全遵循 SQL 标准，并且以其对复杂查询和自定义数据类型的支持而闻名。Oracle 也支持标准 SQL，但引入了许多自己的扩展和功能，这些扩展在一定程度上增强了功能性，但也导致了与其他系统的兼容性问题。对于需要严格遵循 SQL 标准或需要迁移到其他平台的用户，PostgreSQL 可能更具吸引力。</p></li>
+<li><p><strong>性能与优化</strong>: 在性能优化方面，Oracle 提供了广泛的工具和选项，如自动内存管理（AMM）、自动SQL调优等，使得复杂查询和大规模数据处理得以高效执行。PostgreSQL 也具备强大的查询优化器和并行处理能力，但在超大规模数据集和极端性能优化需求下，Oracle 的成熟工具集可能提供更好的支持。</p></li>
+<li><p><strong>社区与支持</strong>: PostgreSQL 拥有一个庞大而活跃的开源社区，用户可以从中获得免费的支持和丰富的资源。Oracle 则主要依赖于商业支持，提供了全面的技术支持服务，但这通常伴随着高昂的费用。对于需要广泛社区支持的用户，PostgreSQL 是一个强大的选择，而对于需要厂商直接支持的大型企业，Oracle 则更为合适。</p></li>
+</ol>
+<p>总结而言，PostgreSQL 和 Oracle 各有优势。PostgreSQL 适合那些寻求低成本、开源灵活性和强大社区支持的用户，而Oracle 则在功能性、企业级支持和超大规模性能优化方面更具优势。</p>
+</section><section id="postgresql-与-oralce-兼容性" class="level2" data-number="1.4"><h2 data-number="1.4" class="anchored" data-anchor-id="postgresql-与-oralce-兼容性">
+<span class="header-section-number">1.4</span> PostgreSQL 与 Oralce 兼容性</h2>
+<p>在数据迁移方面，PostgreSQL 和 Oracle 数据库之间的兼容性是一个复杂且多维度的问题。尽管两者都是功能强大的数据库管理系统，但由于它们在架构、数据类型、SQL 方言以及特性实现上的差异，直接迁移通常面临一定的挑战。以下是关于它们在数据迁移方面兼容性的几点总结：</p>
+<ol type="1">
+<li><p><strong>SQL 语法和方言差异</strong>: Oracle 和 PostgreSQL 虽然都支持 SQL，但它们的 SQL 实现存在差异。Oracle 引入了许多扩展和专有功能，如 PL/SQL 语言、序列和触发器的实现方式等，而这些在 PostgreSQL 中需要不同的实现方式。例如，Oracle 的 PL/SQL 代码通常需要转换为 PostgreSQL 的 PL/pgSQL，而这一过程可能涉及大量的代码重构。此外，Oracle 中的一些专有函数和操作符在 PostgreSQL 中不存在，因此需要通过自定义函数或替代方案来实现。</p></li>
+<li><p><strong>数据类型兼容性</strong>: Oracle 和 PostgreSQL 之间的数据类型并不完全匹配。虽然两者都支持一些基本的数据类型如整数、浮点数和字符类型，但在某些数据类型上存在显著差异。例如，Oracle 的 <code>NUMBER</code> 类型与 PostgreSQL 的 <code>NUMERIC</code> 类型在精度和存储方式上有所不同；Oracle 的 <code>CLOB</code> 和 <code>BLOB</code> 类型在 PostgreSQL 中对应 <code>TEXT</code> 和 <code>BYTEA</code> 类型，这些差异可能会影响数据的存储和处理方式。在迁移过程中，数据类型的不兼容可能需要对表结构进行修改或通过类型转换来解决。</p></li>
+<li><p><strong>存储过程和触发器</strong>: Oracle 的 PL/SQL 是一种功能强大的存储过程语言，而 PostgreSQL 使用的是 PL/pgSQL。尽管两者的功能相似，但语法和功能上存在差异。Oracle 中复杂的存储过程和触发器在迁移到 PostgreSQL 时，可能需要重新编写甚至重构。此外，Oracle 的一些特性如包（Packages）和全局临时表（Global Temporary Tables），在 PostgreSQL 中没有直接的等效实现，需要寻找替代方案或调整应用逻辑。</p></li>
+<li><p><strong>工具支持</strong>: 为了简化迁移过程，有许多工具可以帮助识别和转换不兼容的 SQL 语法和数据类型。例如，Oracle 提供了 SQL Developer 和 Data Pump 工具，而 PostgreSQL 社区则提供了诸如 pg_dump、pgloader 等工具来帮助进行数据导入和转换。然而，即便有这些工具的帮助，复杂的应用程序仍然可能需要手动调整和详细的测试。</p></li>
+<li><p><strong>性能优化差异</strong>: Oracle 和 PostgreSQL 的查询优化器和性能调优机制存在差异。迁移后的系统可能需要调整索引、优化查询计划或重新配置数据库参数，以确保在 PostgreSQL 上的性能能够达到预期。这些调整通常需要在迁移后进行详细的性能测试和优化。</p></li>
+</ol>
+<p>总之，尽管在工具的支持下，Oracle 和 PostgreSQL 之间的数据迁移是可行的，但由于两者在SQL方言、数据类型、存储过程和性能优化等方面存在显著差异，迁移过程通常需要深入的分析、调整和测试，以确保迁移后的系统能够正常运行并满足性能需求。</p>
+</section><section id="postgresql服务器安装之linux环境" class="level2" data-number="1.5"><h2 data-number="1.5" class="anchored" data-anchor-id="postgresql服务器安装之linux环境">
+<span class="header-section-number">1.5</span> PostgreSQL服务器安装之Linux环境</h2>
+<p>在 PostgreSQL 的这一部分中，我们将在 Ubuntu 18.04.4 LTS (Bionic Beaver) 系统上安装 PostgreSQL 版本 14。 PostgreSQL 安装完成后，我们将通过示例探索 PostgreSQL。</p>
+<section id="环境要求" class="level3" data-number="1.5.1"><h3 data-number="1.5.1" class="anchored" data-anchor-id="环境要求">
+<span class="header-section-number">1.5.1</span> 环境要求</h3>
+<ul>
+<li>操作系统 (OS)。我们使用 Ubuntu 18.04.4 LTS 版 Linux 操作系统进行此安装。</li>
+<li>硬件要求。最低硬件要求是 1 GHz 处理器、2 GB RAM 和 512 MB HDD。</li>
+<li>PostgreSQL。已使用 PostgreSQL 版本 14 在 Linux 上安装。</li>
+</ul></section><section id="安装步骤" class="level3" data-number="1.5.2"><h3 data-number="1.5.2" class="anchored" data-anchor-id="安装步骤">
+<span class="header-section-number">1.5.2</span> 安装步骤</h3>
+<p>步骤 1. 在 Ubuntu Linux 上安装 PostgreSQL 的第一步是启用 apt 存储库。请转到 Ubuntu 的 <a href="https://www.postgresql.org/download/linux/ubuntu/">https://www.postgresql.org/download/linux/ubuntu/</a> 目录并复制 apt 存储库行。运行以下语句以启用 Ubuntu 的 PostgreSQL apt 存储库。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> sh <span class="at">-c</span> <span class="st">'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" &gt; /etc/apt/sources.list.d/pgdg.list'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>步骤2. 在此步骤中使用以下命令导入存储库签名密钥并更新包列表。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> <span class="at">--quiet</span> <span class="at">-O</span> <span class="at">-</span> https://www.postgresql.org/media/keys/ACCC4CF8.asc <span class="kw">|</span> <span class="fu">sudo</span> apt-key add <span class="at">-</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>步骤3. Ubuntu 的 PostgreSQL 官方存储库已添加到我们的 Linux 系统中，现在使用以下命令更新系统存储库列表。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>步骤4. 现在使用下面提到的 apt-get 命令来安装 PostgreSQL。我们使用 14 和以下命令来安装 PostgreSQL 14 版本。您只需提及即可安装任何版本。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get <span class="at">-y</span> install postgresql-14</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>步骤5. PostgreSQL 安装完成后，集群将默认初始化。我们可以使用下面的命令来检查 PostgreSQL 集群的状态。图 <a href="#fig-pg-status" class="quarto-xref">Figure&nbsp;<span>1.2</span></a> 中列出PostgreSQL运行的后台进程。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> <span class="at">-ef</span> <span class="kw">|</span> <span class="fu">grep</span> postgres</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-status" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL数据库进程 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-status-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-status.png" class="img-fluid figure-img" alt="PostgreSQL数据库进程 " width="479">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-status-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.2: PostgreSQL数据库进程
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤6. PostgreSQL 在安装时会创建用户名 postgres 和同名的系统帐户，我们可以使用此用户登录 PostgreSQL。使用以下命令登录，并提供用户密码进行身份验证。登录完成后，使用 psql 工具连接到集群，如以下命令所示。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">user@ubuntu:-$</span> sudo <span class="at">-i</span> <span class="at">-u</span> postgres</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">postgres@ubuntu:~$</span> psql</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>图 <a href="#fig-pg-login" class="quarto-xref">Figure&nbsp;<span>1.3</span></a> 显示登录成功的命令行提示符界面。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-login" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL数据库登录后界面 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-login-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-login-psql-client.png" class="img-fluid figure-img" alt="PostgreSQL数据库登录后界面 " width="480">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-login-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.3: PostgreSQL数据库登录后界面
+</figcaption></figure>
+</div>
+</div>
+</div>
+</section></section><section id="postgresql服务器安装之windows环境" class="level2" data-number="1.6"><h2 data-number="1.6" class="anchored" data-anchor-id="postgresql服务器安装之windows环境">
+<span class="header-section-number">1.6</span> PostgreSQL服务器安装之Windows环境</h2>
+<p>在本关于 PostgreSQL 的教程中，我们将介绍在 Windows 10 操作系统上安装 PostgreSQL 版本 14。安装完 PostgreSQL 后，我们将对其进行探索。</p>
+<section id="环境要求-1" class="level3" data-number="1.6.1"><h3 data-number="1.6.1" class="anchored" data-anchor-id="环境要求-1">
+<span class="header-section-number">1.6.1</span> 环境要求</h3>
+<ul>
+<li>操作系统（OS）。我们将使用Windows 10操作系统来安装PostgreSQL。</li>
+<li>硬件要求。最低硬件要求是 1 GHz 处理器、2 GB RAM 和 512 MB HDD。</li>
+<li>PostgreSQL。 PostgreSQL 版本 14 用于安装在 Windows 10 操作系统上。</li>
+</ul></section><section id="安装步骤-1" class="level3" data-number="1.6.2"><h3 data-number="1.6.2" class="anchored" data-anchor-id="安装步骤-1">
+<span class="header-section-number">1.6.2</span> 安装步骤</h3>
+<p>步骤1. 请导航到下面的 PostgreSQL 下载链接。 <a href="https://www.postgresql.org/downloads">https://www.postgresql.org/downloads</a></p>
+<p>图 <a href="#fig-pg-download-windows" class="quarto-xref">Figure&nbsp;<span>1.4</span></a> 显示了下载的界面。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-download-windows" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL数据库下载界面 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-download-windows-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-download-windows.png" class="img-fluid figure-img" alt="PostgreSQL数据库下载界面 " width="472">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-download-windows-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.4: PostgreSQL数据库下载界面
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤2. 选择操作系统为windows，然后如下图 <a href="#fig-pg-select-windows" class="quarto-xref">Figure&nbsp;<span>1.5</span></a> 所示进行操作。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-select-windows" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL数据库下载界面 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-select-windows-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-select-windows.png" class="img-fluid figure-img" alt="PostgreSQL数据库下载界面 " width="472">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-select-windows-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.5: PostgreSQL数据库下载界面
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤3. 现在单击“下载安装程序”以下载软件。如图 <a href="#fig-pg-download-installer" class="quarto-xref">Figure&nbsp;<span>1.6</span></a> 所示。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-download-installer" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL数据库下载界面 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-download-installer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-download-installer.png" class="img-fluid figure-img" alt="PostgreSQL数据库下载界面 " width="472">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-download-installer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.6: PostgreSQL数据库下载界面
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤4. 选择Windows x86-64，然后单击下载按钮开始下载。</p>
+<p>步骤5. 现在转到 Windows 的下载文件夹，右键单击 PostgreSQL 设置文件，然后选择以管理员身份运行。</p>
+<p>步骤6. PostgreSQL 安装向导将启动。</p>
+<p>步骤7. 现在选择安装目录以继续安装。如图 <a href="#fig-pg-select-windows-directory" class="quarto-xref">Figure&nbsp;<span>1.7</span></a> 所示。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-select-windows-directory" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL数据库安装界面 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-select-windows-directory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-select-windows-directory.png" class="img-fluid figure-img" alt="PostgreSQL数据库安装界面 " width="206">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-select-windows-directory-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.7: PostgreSQL数据库安装界面
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤8. 从列表中选择所有组件，然后单击“下一步”继续。如图 <a href="#fig-pg-select-all-components" class="quarto-xref">Figure&nbsp;<span>1.8</span></a> 所示。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-select-all-components" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL数据库安装界面 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-select-all-components-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-select-all-components.png" class="img-fluid figure-img" alt="PostgreSQL数据库安装界面 " width="206">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-select-all-components-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.8: PostgreSQL数据库安装界面
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤9. 选择数据目录的位置，然后单击下一步。如图 <a href="#fig-pg-postgresql-data-directory-location" class="quarto-xref">Figure&nbsp;<span>1.9</span></a> 所示。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-postgresql-data-directory-location" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL数据库安装界面 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-postgresql-data-directory-location-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-data-directory-location.png" class="img-fluid figure-img" alt="PostgreSQL数据库安装界面 " width="202">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-postgresql-data-directory-location-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.9: PostgreSQL数据库安装界面
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤10. 现在请输入数据库超级用户postgres的密码，然后单击下一步。如图 <a href="#fig-pg-database-superuser-setup" class="quarto-xref">Figure&nbsp;<span>1.10</span></a> 所示。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-database-superuser-setup" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL用户配置 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-database-superuser-setup-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-database-superuser-setup.png" class="img-fluid figure-img" alt="PostgreSQL用户配置 " width="205">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-database-superuser-setup-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.10: PostgreSQL用户配置
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤11. PostgreSQL 默认端口是 5432。所以保持原样，然后单击下一步。如图 <a href="#fig-pg-postgresql-default-port" class="quarto-xref">Figure&nbsp;<span>1.11</span></a> 所示。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-postgresql-default-port" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL端口配置 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-postgresql-default-port-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-default-port.png" class="img-fluid figure-img" alt="PostgreSQL端口配置 " width="204">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-postgresql-default-port-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.11: PostgreSQL端口配置
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤12. PostgreSQL 向导将显示用于安装的设置，如下图 <a href="#fig-pg-pre-installation" class="quarto-xref">Figure&nbsp;<span>1.12</span></a> 所示。单击下一步继续。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-pre-installation" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL安装界面 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-pre-installation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-pre-installation.png" class="img-fluid figure-img" alt="PostgreSQL安装界面 " width="203">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-pre-installation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.12: PostgreSQL安装界面
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤13. PostgreSQL 向导将开始安装，如下图 <a href="#fig-pg-setup-installing" class="quarto-xref">Figure&nbsp;<span>1.13</span></a> 所示。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-setup-installing" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL安装界面 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-setup-installing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-setup-installing.png" class="img-fluid figure-img" alt="PostgreSQL安装界面 " width="203">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-setup-installing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.13: PostgreSQL安装界面
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤14. 在 Windows 上完成 PostgreSQL 安装后，我们将收到以下窗口 <a href="#fig-pg-installation-complete" class="quarto-xref">Figure&nbsp;<span>1.14</span></a> 。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-installation-complete" class="quarto-float quarto-figure quarto-figure-center anchored" alt="PostgreSQL安装成功界面 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-installation-complete-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-installation-complete.png" class="img-fluid figure-img" alt="PostgreSQL安装成功界面 " width="204">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-installation-complete-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.14: PostgreSQL安装成功界面
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤15. 现在转到 Windows“开始”并选择 PostgreSQL 14，然后选择 pgAdmin 4。输入我们在安装过程中输入的密码以检查连接。如图 <a href="#fig-pg-start-pgadmin4" class="quarto-xref">Figure&nbsp;<span>1.15</span></a> 所示。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-start-pgadmin4" class="quarto-float quarto-figure quarto-figure-center anchored" alt="pgAdmin 4 运行 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-start-pgadmin4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-start-pgadmin4.png" class="img-fluid figure-img" alt="pgAdmin 4 运行 " width="111">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-start-pgadmin4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.15: pgAdmin 4 运行
+</figcaption></figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-start-pgadmin4-login" class="quarto-float quarto-figure quarto-figure-center anchored" alt="pgAdmin 4 登录 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-start-pgadmin4-login-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-pgadmin4-login.png" class="img-fluid figure-img" alt="pgAdmin 4 登录 " width="363">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-start-pgadmin4-login-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.16: pgAdmin 4 登录
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>步骤16. 我们可以看到数据库集群已启动并正在运行，仪表板显示了数据库的不同参数，例如数据库会话、每秒事务数、块 I/O 等。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pg-start-pgadmin-portal" class="quarto-float quarto-figure quarto-figure-center anchored" alt="pgAdmin 4 界面 ">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-pg-start-pgadmin-portal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/ch-1/postgresql-pgadmin-portal.png" class="img-fluid figure-img" alt="pgAdmin 4 界面 " width="486">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pg-start-pgadmin-portal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.17: pgAdmin 4 界面
+</figcaption></figure>
+</div>
+</div>
+</div>
+
+
+</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/r4ds\.hadley\.nz\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link" aria-label="前言">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">前言</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer"><div class="nav-footer">
+    <div class="nav-footer-left">
+<p>健康大数据SQL编程，薛付忠 编著</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/hadley/r4ds/edit/main/intro.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/hadley/r4ds/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><span class="citation" data-cites="2024">@2024</span> 山东大学</p>
+</div>
+  </div>
+</footer>
+
+
+</body></html>
