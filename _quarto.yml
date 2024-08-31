@@ -13,8 +13,8 @@ book:
       @2024 山东大学
   cover-image: cover.jpg
   favicon: cover.jpg
-  site-url: https://r4ds.hadley.nz/
-  repo-url: https://github.com/hadley/r4ds/
+  site-url: https://sql.nihds.com/
+  repo-url: https://github.com/jingmingcn/r4ds/
   repo-branch: main
   repo-actions: [edit, issue]
   chapters:
@@ -77,7 +77,7 @@ format:
       - r4ds.scss
     code-link: true
 
-    author-meta: "Hadley Wickham, Mine Çetinkaya-Rundel, and Garrett Grolemund"
+    author-meta: "薛付忠"
     include-in-header: "plausible.html"
     callout-appearance: simple
 
