@@ -259,7 +259,7 @@ ps -ef | grep postgres
 #|   PostgreSQL数据库进程
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-status.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-status.png", dpi = 120)
 ```
 
 步骤6. PostgreSQL 在安装时会创建用户名 postgres 和同名的系统帐户，我们可以使用此用户登录 PostgreSQL。使用以下命令登录，并提供用户密码进行身份验证。登录完成后，使用 psql 工具连接到集群，如以下命令所示。
@@ -281,7 +281,7 @@ postgres@ubuntu:~$ psql
 #|   PostgreSQL数据库登录后界面
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-login-psql-client.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-login-psql-client.png", dpi = 120)
 ```
 
 ## PostgreSQL服务器安装之Windows环境
@@ -308,7 +308,7 @@ knitr::include_graphics("images/ch-1/postgresql-login-psql-client.png", dpi = 27
 #|   PostgreSQL数据库下载界面
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-download-windows.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-download-windows.png", dpi = 120)
 ```
 
 步骤2.  选择操作系统为windows，然后如下图 @fig-pg-select-windows 所示进行操作。
@@ -322,7 +322,7 @@ knitr::include_graphics("images/ch-1/postgresql-download-windows.png", dpi = 270
 #|   PostgreSQL数据库下载界面
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-select-windows.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-select-windows.png", dpi = 120)
 ```
 
 步骤3. 现在单击“下载安装程序”以下载软件。如图 @fig-pg-download-installer 所示。
@@ -336,7 +336,7 @@ knitr::include_graphics("images/ch-1/postgresql-select-windows.png", dpi = 270)
 #|   PostgreSQL数据库下载界面
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-download-installer.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-download-installer.png", dpi = 120)
 ```
 
 步骤4. 选择Windows x86-64，然后单击下载按钮开始下载。
@@ -356,7 +356,7 @@ knitr::include_graphics("images/ch-1/postgresql-download-installer.png", dpi = 2
 #|   PostgreSQL数据库安装界面
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-select-windows-directory.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-select-windows-directory.png", dpi = 120)
 ```
 
 步骤8. 从列表中选择所有组件，然后单击“下一步”继续。如图 @fig-pg-select-all-components 所示。
@@ -370,7 +370,7 @@ knitr::include_graphics("images/ch-1/postgresql-select-windows-directory.png", d
 #|   PostgreSQL数据库安装界面
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-select-all-components.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-select-all-components.png", dpi = 120)
 ```
 
 步骤9. 选择数据目录的位置，然后单击下一步。如图 @fig-pg-postgresql-data-directory-location 所示。
@@ -384,7 +384,7 @@ knitr::include_graphics("images/ch-1/postgresql-select-all-components.png", dpi 
 #|   PostgreSQL数据库安装界面
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-data-directory-location.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-data-directory-location.png", dpi = 120)
 ```
 
 步骤10. 现在请输入数据库超级用户postgres的密码，然后单击下一步。如图 @fig-pg-database-superuser-setup 所示。
@@ -398,7 +398,7 @@ knitr::include_graphics("images/ch-1/postgresql-data-directory-location.png", dp
 #|   PostgreSQL用户配置
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-database-superuser-setup.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-database-superuser-setup.png", dpi = 120)
 ```
 
 步骤11. PostgreSQL 默认端口是 5432。所以保持原样，然后单击下一步。如图 @fig-pg-postgresql-default-port 所示。
@@ -412,7 +412,7 @@ knitr::include_graphics("images/ch-1/postgresql-database-superuser-setup.png", d
 #|   PostgreSQL端口配置
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-default-port.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-default-port.png", dpi = 120)
 ```
 
 步骤12. PostgreSQL 向导将显示用于安装的设置，如下图 @fig-pg-pre-installation 所示。单击下一步继续。
@@ -426,7 +426,7 @@ knitr::include_graphics("images/ch-1/postgresql-default-port.png", dpi = 270)
 #|   PostgreSQL安装界面
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-pre-installation.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-pre-installation.png", dpi = 120)
 ```
 
 步骤13. PostgreSQL 向导将开始安装，如下图 @fig-pg-setup-installing 所示。
@@ -440,7 +440,7 @@ knitr::include_graphics("images/ch-1/postgresql-pre-installation.png", dpi = 270
 #|   PostgreSQL安装界面
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-setup-installing.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-setup-installing.png", dpi = 120)
 ```
 
 步骤14. 在 Windows 上完成 PostgreSQL 安装后，我们将收到以下窗口 @fig-pg-installation-complete 。
@@ -454,7 +454,7 @@ knitr::include_graphics("images/ch-1/postgresql-setup-installing.png", dpi = 270
 #|   PostgreSQL安装成功界面
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-installation-complete.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-installation-complete.png", dpi = 120)
 ```
 
 步骤15. 现在转到 Windows“开始”并选择 PostgreSQL 14，然后选择 pgAdmin 4。输入我们在安装过程中输入的密码以检查连接。如图 @fig-pg-start-pgadmin4 所示。
@@ -468,7 +468,7 @@ knitr::include_graphics("images/ch-1/postgresql-installation-complete.png", dpi 
 #|   pgAdmin 4 运行
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-start-pgadmin4.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-start-pgadmin4.png", dpi = 120)
 ```
 
 ```{r}
@@ -480,7 +480,7 @@ knitr::include_graphics("images/ch-1/postgresql-start-pgadmin4.png", dpi = 270)
 #|   pgAdmin 4 登录
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-pgadmin4-login.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-pgadmin4-login.png", dpi = 120)
 ```
 
 步骤16. 我们可以看到数据库集群已启动并正在运行，仪表板显示了数据库的不同参数，例如数据库会话、每秒事务数、块 I/O 等。
@@ -494,6 +494,6 @@ knitr::include_graphics("images/ch-1/postgresql-pgadmin4-login.png", dpi = 270)
 #|   pgAdmin 4 界面
 #| out.width: NULL
 
-knitr::include_graphics("images/ch-1/postgresql-pgadmin-portal.png", dpi = 270)
+knitr::include_graphics("images/ch-1/postgresql-pgadmin-portal.png", dpi = 120)
 ```
 
