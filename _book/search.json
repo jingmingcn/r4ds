@@ -78,5 +78,15 @@
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>PostgreSQL数据库环境搭建</span>"
     ]
+  },
+  {
+    "objectID": "intro.html#postgresql服务器安装之macos环境",
+    "href": "intro.html#postgresql服务器安装之macos环境",
+    "title": "1  PostgreSQL数据库环境搭建",
+    "section": "\n1.7 PostgreSQL服务器安装之MacOS环境",
+    "text": "1.7 PostgreSQL服务器安装之MacOS环境\nPostgreSQL在macOS平台上提供了多种安装方式，推荐参考以下网址下载应用程序。 https://postgresapp.com/",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>PostgreSQL数据库环境搭建</span>"
+    ]
   }
 ]

@@ -497,3 +497,7 @@ knitr::include_graphics("images/ch-1/postgresql-pgadmin4-login.png", dpi = 120)
 knitr::include_graphics("images/ch-1/postgresql-pgadmin-portal.png", dpi = 120)
 ```
 
+## PostgreSQL服务器安装之MacOS环境
+
+PostgreSQL在macOS平台上提供了多种安装方式，推荐参考以下网址下载应用程序。
+[https://postgresapp.com/](https://postgresapp.com/)
